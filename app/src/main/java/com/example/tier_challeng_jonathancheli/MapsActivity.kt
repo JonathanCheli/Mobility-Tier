@@ -407,7 +407,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         }
 
 
-        mMap!!.setOnMapClickListener {
+        mMap!!.setOnMapLongClickListener {
             binding.idLinear.visibility = View.GONE
             binding.idTierMobility.text = getString(R.string.tier_mobility)
             if (polyLinePaths != null) {
