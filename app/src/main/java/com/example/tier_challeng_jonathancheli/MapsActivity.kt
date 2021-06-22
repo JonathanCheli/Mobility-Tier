@@ -32,6 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterManager
+import java.util.*
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderListener {
@@ -85,6 +86,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     private var progressDialog: ProgressDialog? = null
 
     private var poly : MutableList<PolylineOptions> = ArrayList()
+
+    var lines : MutableList<Polyline> = ArrayList<Polyline>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -216,14 +219,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
         }
         
-        mMap!!.setOnMapClickListener { 
-            binding.idLinear.visibility = View.GONE
-            binding.idTierMobility.text = getString(R.string.tier_mobility)
-            poly.clear()
-            polyLinePaths!!.clear()
 
-            
-        }
 
 
 
@@ -395,6 +391,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
             mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(nearestLocation!!, 15f))
 
 
+
             val polylineOptions = PolylineOptions()
                 .geodesic(true)
                 .color(Color.BLUE)
@@ -403,8 +400,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                  polylineOptions.add(route.points!![i])
             }
 
-             poly = mutableListOf(polylineOptions)
              polyLinePaths!!.add(mMap!!.addPolyline(polylineOptions))
+
+
+
+        }
+
+
+        mMap!!.setOnMapClickListener {
+            binding.idLinear.visibility = View.GONE
+            binding.idTierMobility.text = getString(R.string.tier_mobility)
+            if (polyLinePaths != null) {
+                for (polylinePath in polyLinePaths!!) {
+                    polylinePath.remove()
+                }
+            }
+
+
 
 
         }
