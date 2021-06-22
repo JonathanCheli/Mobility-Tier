@@ -8,12 +8,13 @@ class MyItem(
     lat: Double,
     lng: Double,
     title: String,
-    snippet: String
+    snippet: String,
 ) : ClusterItem {
 
     private val position: LatLng
     private val title: String
     private val snippet: String
+
 
     override fun getPosition(): LatLng {
         return position
@@ -26,6 +27,9 @@ class MyItem(
     override fun getSnippet(): String? {
         return snippet
     }
+
+
+
 
     init {
         position = LatLng(lat, lng)

@@ -84,6 +84,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     private var polyLinePaths: MutableList<Polyline>? = ArrayList()
     private var progressDialog: ProgressDialog? = null
 
+    private var poly : MutableList<PolylineOptions> = ArrayList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -103,6 +105,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     @SuppressLint("SetTextI18n")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
 
 
 
@@ -212,6 +215,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
 
         }
+        
+        mMap!!.setOnMapClickListener { 
+            binding.idLinear.visibility = View.GONE
+            binding.idTierMobility.text = getString(R.string.tier_mobility)
+            poly.clear()
+            polyLinePaths!!.clear()
+
+            
+        }
 
 
 
@@ -240,7 +252,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
 
     private fun cameraConfigurations(latLng: LatLng) {
-        mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latLng.latitude,latLng.longitude),16f))
+        mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latLng.latitude,latLng.longitude),15f))
 
 
     }
@@ -380,7 +392,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
                 )!!
             )
-            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(nearestLocation!!, 16f))
+            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(nearestLocation!!, 15f))
 
 
             val polylineOptions = PolylineOptions()
@@ -390,6 +402,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
             for (i in 0 until route.points!!.size) {
                  polylineOptions.add(route.points!![i])
             }
+
+             poly = mutableListOf(polylineOptions)
              polyLinePaths!!.add(mMap!!.addPolyline(polylineOptions))
 
 

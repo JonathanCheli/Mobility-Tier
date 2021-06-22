@@ -3,4 +3,5 @@
     <string name="title_activity_maps">Map</string>
 
     <string name="tier_number">TIER Nº</string>
+    <string name="tier_mobility">TIER MOBILITY</string>
 </resources>
