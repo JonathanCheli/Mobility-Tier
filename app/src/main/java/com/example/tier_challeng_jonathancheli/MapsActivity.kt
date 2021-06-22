@@ -1,6 +1,5 @@
 package com.example.tier_challeng_jonathancheli
 
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
@@ -33,7 +32,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterManager
-import java.util.*
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderListener {
@@ -56,7 +54,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     private var fleetbirdId : Int? = null
 
 
-    var marker : Marker?= null
+    var clusterManager : ClusterManager<MyItem>? =null
+
+    var items : MutableList<MyItem>? = null
 
     private fun bitmapDescriptorFromVector(
         context: Context,
@@ -79,8 +79,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
-
-
     private var originMarkers: MutableList<Marker>? = ArrayList()
     private var destinationMarker: MutableList<Marker>? = ArrayList()
     private var polyLinePaths: MutableList<Polyline>? = ArrayList()
@@ -100,19 +98,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
         fusedLocation = LocationServices.getFusedLocationProviderClient(this)
 
-
-
-
-
-
     }
-
-
 
     @SuppressLint("SetTextI18n")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+
+
+        clusterManager = ClusterManager<MyItem>(this, mMap)
+        clusterManager!!.renderer = MarkerClusterRenderer(this, mMap, clusterManager!!)
+        mMap!!.setOnCameraIdleListener(clusterManager)
+        mMap !!. setOnMarkerClickListener(clusterManager)
+        mMap !!. setOnInfoWindowClickListener (clusterManager)
 
 
 
@@ -144,6 +142,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
             it.forEach { latLonModel ->
                 latLng = LatLng(latLonModel.latitude.toDouble(), latLonModel.longitude.toDouble())
 
+
+                /*
                 val markerOptions = MarkerOptions()
                 markerOptions!!.position(latLng!!)
 
@@ -151,12 +151,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                 markerOptions!!.title(newlocationName)
                 markerOptions!!.icon(bitmapDescriptorFromVector(this,R.drawable.ic_location_blue))
                 marker = mMap?.addMarker(markerOptions)
+                 */
 
 
 
 
+                addPersonItems (latLonModel)
+                clusterManager!!.cluster()
 
-
+                items = mutableListOf()
 
 
                 var distance = 0.0
@@ -183,8 +186,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                             fleetbirdId = it[nearestLocationIndex].fleetbirdId
 
 
-
-
                         }
 
                     }
@@ -193,7 +194,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
 
             }
-
 
 
         })
@@ -215,7 +215,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
 
 
-
         binding.closestLocationButton.setOnClickListener{
 
             sendRequest()
@@ -231,6 +230,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
     }
 
+    private fun addPersonItems(latLonModel: Scooter) {
+        var newlocationName = obtainAddress(latLng!!)
+        clusterManager!!.addItem(MyItem(latLonModel.latitude.toDouble(), latLonModel.longitude.toDouble(), newlocationName, latLonModel.zoneId))
+
+
+
+    }
 
 
     private fun cameraConfigurations(latLng: LatLng) {
