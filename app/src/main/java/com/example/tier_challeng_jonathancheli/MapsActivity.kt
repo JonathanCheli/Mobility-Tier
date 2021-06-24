@@ -26,7 +26,6 @@ import com.example.tier_challeng_jonathancheli.Helper.DirectionFinderListener
 import com.example.tier_challeng_jonathancheli.Helper.Route
 import com.example.tier_challeng_jonathancheli.adapter.MyCustomAdapterForItems
 import com.example.tier_challeng_jonathancheli.databinding.ActivityMapsBinding
-import com.example.tier_challeng_jonathancheli.databinding.InfoWindowBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -129,7 +128,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         ) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 1
 
             )
@@ -421,17 +420,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
             }
 
              polyLinePaths!!.add(mMap!!.addPolyline(polylineOptions))
-
-
-
+            
         }
+        mMap!!.setOnMapLongClickListener {
 
-
-        mMap!!.setOnMapLongClickListener{
             binding.idLinear.visibility = View.GONE
             binding.idTierMobility.text = getString(R.string.tier_mobility)
             for (destMarker in destinationMarker!!) {
-                destMarker!!.remove()
+                destMarker.remove()
             }
 
             if (polyLinePaths != null) {
@@ -440,19 +436,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                 }
             }
 
-
-
-
-
-
         }
-
-
-
     }
-
-
-
 
     override fun onClusterItemInfoWindowClick(item: MyItem?) {
 
@@ -470,8 +455,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         }
 
     }
-
-
-
 }
+
+
 
