@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -23,7 +24,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.tier_challeng_jonathancheli.Helper.DirectionFinder
 import com.example.tier_challeng_jonathancheli.Helper.DirectionFinderListener
 import com.example.tier_challeng_jonathancheli.Helper.Route
+import com.example.tier_challeng_jonathancheli.adapter.MyCustomAdapterForItems
 import com.example.tier_challeng_jonathancheli.databinding.ActivityMapsBinding
+import com.example.tier_challeng_jonathancheli.databinding.InfoWindowBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -35,29 +38,26 @@ import com.google.maps.android.clustering.ClusterManager
 import java.util.*
 
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderListener , ClusterManager.OnClusterItemInfoWindowClickListener<MyItem> {
 
     private var mMap: GoogleMap? = null
     private lateinit var binding: ActivityMapsBinding
     private var dataViewModel: DataViewModel? = null
     private lateinit var fusedLocation: FusedLocationProviderClient
     private var currentLocation: LatLng? = null
-
-
-
     private var latLng : LatLng ? = null
-
-
     private var nearestLocation : LatLng? = null
-
     private var nearestLocationBattery : Int?= null
-
     private var fleetbirdId : Int? = null
-
-
     var clusterManager : ClusterManager<MyItem>? =null
-
     var items : MutableList<MyItem>? = null
+
+    private var clickedClusterItem :MyItem? = null
+
+
+    private var scooterData : Scooter? = null
+
+
 
     private fun bitmapDescriptorFromVector(
         context: Context,
@@ -85,10 +85,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     private var polyLinePaths: MutableList<Polyline>? = ArrayList()
     private var progressDialog: ProgressDialog? = null
 
-    private var poly : MutableList<PolylineOptions> = ArrayList()
 
-    var lines : MutableList<Polyline> = ArrayList<Polyline>()
-
+    private var markerPosition : LatLng? =null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -117,6 +115,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         mMap!!.setOnCameraIdleListener(clusterManager)
         mMap !!. setOnMarkerClickListener(clusterManager)
         mMap !!. setOnInfoWindowClickListener (clusterManager)
+
+        mMap!!.setInfoWindowAdapter(clusterManager!!.markerManager)
+        clusterManager!!.setOnClusterItemInfoWindowClickListener(this)
 
 
 
@@ -149,21 +150,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                 latLng = LatLng(latLonModel.latitude.toDouble(), latLonModel.longitude.toDouble())
 
 
-                /*
-                val markerOptions = MarkerOptions()
-                markerOptions!!.position(latLng!!)
+                scooterData = latLonModel
 
-                var newlocationName = obtainAddress(latLng!!)
-                markerOptions!!.title(newlocationName)
-                markerOptions!!.icon(bitmapDescriptorFromVector(this,R.drawable.ic_location_blue))
-                marker = mMap?.addMarker(markerOptions)
-                 */
+                clusterManager!!.setOnClusterItemClickListener(object :
+                    ClusterManager.OnClusterItemClickListener<MyItem?> {
+                    override fun onClusterItemClick(item: MyItem?): Boolean {
+                        clickedClusterItem = item!!
 
+                        markerPosition = item.position
 
 
+                        return false
 
-                addPersonItems (latLonModel)
+
+                    }
+
+
+                })
+
+
+
+
+
+                addPersonItems(latLonModel)
+
+                clusterManager!!.markerCollection.setInfoWindowAdapter(MyCustomAdapterForItems(this))
+
+
+
                 clusterManager!!.cluster()
+
+
 
                 items = mutableListOf()
 
@@ -171,24 +188,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                 var distance = 0.0
                 var nearestLocationIndex = 0
                 for (i in it.indices) {
+
                     val currentDistance = getDistanceInMeter(
-                        LatLng(it.get(i).latitude.toDouble(),it.get(i).longitude.toDouble()),
+                        LatLng(it.get(i).latitude.toDouble(), it.get(i).longitude.toDouble()),
                         currentLocation!!
                     )
-                    if(i == 0 ) {
+
+
+                    if (i == 0) {
                         distance = currentDistance
                         nearestLocationIndex = i
 
-                    }else{
-                        if(currentDistance < distance) {
+                    } else {
+                        if (currentDistance < distance) {
                             distance = currentDistance
                             nearestLocationIndex = i
 
-                            nearestLocation = LatLng(it[nearestLocationIndex].latitude.toDouble(),
-                                it[nearestLocationIndex].longitude.toDouble())
+                            nearestLocation = LatLng(
+                                it[nearestLocationIndex].latitude.toDouble(),
+                                it[nearestLocationIndex].longitude.toDouble()
+                            )
+
 
                             nearestLocationBattery = it[nearestLocationIndex].battery
-
                             fleetbirdId = it[nearestLocationIndex].fleetbirdId
 
 
@@ -197,7 +219,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                     }
 
                 }
-
 
             }
 
@@ -239,9 +260,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     }
 
     private fun addPersonItems(latLonModel: Scooter) {
-        var newlocationName = obtainAddress(latLng!!)
-        clusterManager!!.addItem(MyItem(latLonModel.latitude.toDouble(), latLonModel.longitude.toDouble(), newlocationName, latLonModel.zoneId))
-
+        val newlocationName = obtainAddress(latLng!!)
+        clusterManager!!.addItem(MyItem(latLonModel.latitude.toDouble(), latLonModel.longitude.toDouble(), newlocationName,snippet = ""))
 
 
     }
@@ -407,14 +427,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         }
 
 
-        mMap!!.setOnMapClickListener {
+        mMap!!.setOnMapLongClickListener{
             binding.idLinear.visibility = View.GONE
             binding.idTierMobility.text = getString(R.string.tier_mobility)
+            for (destMarker in destinationMarker!!) {
+                destMarker!!.remove()
+            }
+
             if (polyLinePaths != null) {
                 for (polylinePath in polyLinePaths!!) {
                     polylinePath.remove()
                 }
             }
+
+
 
 
 
@@ -425,4 +451,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
     }
 
+
+
+
+    override fun onClusterItemInfoWindowClick(item: MyItem?) {
+
+        val intent = Intent(this, OtherActivity::class.java)
+
+
+        startActivity(intent)
+
+        //You may want to do different things for each InfoWindow:
+
+        //You may want to do different things for each InfoWindow:
+        if (item!!.getTitle().equals("some title")) {
+
+            //do something specific to this InfoWindow....
+        }
+
+    }
+
+
+
 }
+

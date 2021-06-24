@@ -10,10 +10,10 @@ class MyItem(
     title: String,
     snippet: String,
 ) : ClusterItem {
-
     private val position: LatLng
     private val title: String
     private val snippet: String
+
 
 
     override fun getPosition(): LatLng {
@@ -29,11 +29,11 @@ class MyItem(
     }
 
 
-
-
     init {
         position = LatLng(lat, lng)
         this.title = title
         this.snippet = snippet
+
+
     }
 }
