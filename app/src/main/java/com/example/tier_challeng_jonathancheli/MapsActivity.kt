@@ -397,8 +397,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
             )
 
-
-
             destinationMarker!!.add(
                 mMap!!.addMarker(
                     MarkerOptions()
