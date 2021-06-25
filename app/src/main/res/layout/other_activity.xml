@@ -2,9 +2,157 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/vehicleimage2"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:orientation="vertical"
+        android:background="@drawable/vehicleimage2">
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_margin="6dp"
+        tools:listitem="@layout/recycler_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </androidx.recyclerview.widget.RecyclerView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/id_zone_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/main_blue_color"
+                android:text="Vehicle information">
+            </TextView>
+
+
+            <TextView
+                android:id="@+id/id_resolution"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:textColor="@color/main_blue_color"
+                android:text="ZoneId:">
+            </TextView>
+
+            <TextView
+                android:id="@+id/id_resolvedBy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:textColor="@color/main_blue_color"
+                android:text="Resolution:">
+            </TextView>
+
+            <TextView
+                android:id="@+id/id_resolvedAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:textColor="@color/main_blue_color"
+                android:text="Battery:">
+            </TextView>
+            <TextView
+                android:id="@+id/id_battery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:textColor="@color/main_blue_color"
+                android:text="State:">
+            </TextView>
+            <TextView
+                android:id="@+id/id_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:textColor="@color/main_blue_color"
+                android:text="Model:">
+            </TextView>
+            <TextView
+                android:id="@+id/id_model"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:textColor="@color/main_blue_color"
+                android:text="FleetbirdId:">
+            </TextView>
+
+
+            <TextView
+                android:id="@+id/id_fleetbirdId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:textColor="@color/main_blue_color"
+                android:text="Street Address:">
+            </TextView>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/design_default_color_secondary"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="5dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/square_frame">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="News"
+                    android:textSize="20sp"
+                    android:textColor="@color/main_blue_color">
+
+                </TextView>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="5dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/square_frame">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recommendations"
+                    android:textSize="20sp"
+                    android:textColor="@color/main_blue_color">
+
+                </TextView>
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
 
 
 

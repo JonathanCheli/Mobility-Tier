@@ -37,6 +37,10 @@ import com.google.maps.android.clustering.ClusterManager
 import java.util.*
 
 
+
+
+
+
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderListener , ClusterManager.OnClusterItemInfoWindowClickListener<MyItem> {
 
     private var mMap: GoogleMap? = null
@@ -50,9 +54,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     private var fleetbirdId : Int? = null
     var clusterManager : ClusterManager<MyItem>? =null
     var items : MutableList<MyItem>? = null
-
     private var clickedClusterItem :MyItem? = null
-
 
     private var scooterData : Scooter? = null
 
@@ -83,9 +85,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     private var destinationMarker: MutableList<Marker>? = ArrayList()
     private var polyLinePaths: MutableList<Polyline>? = ArrayList()
     private var progressDialog: ProgressDialog? = null
-
-
+    private var progressDialog2: ProgressDialog? = null
     private var markerPosition : LatLng? =null
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -98,7 +102,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         mapFragment.getMapAsync(this)
 
 
+
         fusedLocation = LocationServices.getFusedLocationProviderClient(this)
+
+        progressDialog2 = ProgressDialog.show(this, "Please wait", "Loading map", true)
+
 
     }
 
@@ -116,7 +124,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         mMap !!. setOnInfoWindowClickListener (clusterManager)
 
         mMap!!.setInfoWindowAdapter(clusterManager!!.markerManager)
+        progressDialog2!!.dismiss()
         clusterManager!!.setOnClusterItemInfoWindowClickListener(this)
+
 
 
 
@@ -157,6 +167,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                         clickedClusterItem = item!!
 
                         markerPosition = item.position
+
 
 
                         return false
@@ -230,7 +241,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
             if (location != null) {
                 currentLocation = LatLng(location.latitude, location.longitude)
                 mMap!!.moveCamera(CameraUpdateFactory.newLatLng(currentLocation!!))
-                mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation!!, 15f))
+                mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation!!, 18f))
 
 
             }
@@ -244,17 +255,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
 
         binding.closestLocationButton.setOnClickListener{
-
             sendRequest()
-
             binding.idLinear.visibility = View.VISIBLE
             binding.batteryId.text = nearestLocationBattery.toString() + " %"
-            binding.batteryId.setCompoundDrawablesWithIntrinsicBounds(R.drawable.battery, 0, 0, 0)
-
-
+            binding.batteryId.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_battery_blue, 0, 0, 0)
             binding.idTierMobility.text = getString(R.string.tier_number) + fleetbirdId.toString()
         }
-
 
     }
 
@@ -267,18 +273,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
 
     private fun cameraConfigurations(latLng: LatLng) {
-        mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latLng.latitude,latLng.longitude),15f))
-
-
+        mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latLng.latitude,latLng.longitude),18f))
     }
-
     private fun sendRequest() {
-        try {
-            DirectionFinder(this, currentLocation!!, nearestLocation!!).execute()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
+            try {
+                DirectionFinder(this, currentLocation!!, nearestLocation!!).execute()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
     }
 
     private fun getDistanceInMeter(start: LatLng, end: LatLng): Double {
@@ -334,7 +336,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         // we return the text of the address//
         return textAddress
     }
-
 
 
     fun onDirectionFinderStart(route: List<Route?>?) {
@@ -405,7 +406,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
                 )!!
             )
-            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(nearestLocation!!, 15f))
+            mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(nearestLocation!!, 16f))
 
 
 

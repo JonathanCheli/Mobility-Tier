@@ -20,6 +20,7 @@
     </LinearLayout>
 
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="180dp"
@@ -86,9 +87,9 @@
                     android:id="@+id/battery_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/main_blue_color"
                     android:layout_marginStart="6dp"
-                    android:layout_marginEnd="6dp"
-                    android:text="njnjjnj">
+                    android:layout_marginEnd="6dp">
 
                 </TextView>
 
@@ -96,9 +97,9 @@
                     android:id="@+id/textViewDistance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/main_blue_color"
                     android:layout_marginStart="6dp"
-                    android:layout_marginEnd="6dp"
-                    android:text="njjjjj"/>
+                    android:layout_marginEnd="6dp" />
 
 
 
@@ -106,9 +107,9 @@
                     android:id="@+id/textViewTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/main_blue_color"
                     android:layout_marginStart="6dp"
-                    android:layout_marginEnd="6dp"
-                    android:text="ahahaah">
+                    android:layout_marginEnd="6dp">
 
                 </TextView>
 
