@@ -176,7 +176,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                 })
 
 
-                addPersonItems(latLonModel)
+                addScooterItems(latLonModel)
                 clusterManager!!.markerCollection.setInfoWindowAdapter(MyCustomAdapterForItems(this))
                 clusterManager!!.cluster()
 
@@ -236,7 +236,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     }
 
 
-    private fun addPersonItems(latLonModel: Scooter) {
+    private fun addScooterItems(latLonModel: Scooter) {
         val newlocationName = obtainAddress(latLng!!)
         clusterManager!!.addItem(MyItem(
             latLonModel.latitude.toDouble(),
