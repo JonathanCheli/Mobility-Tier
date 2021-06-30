@@ -143,7 +143,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
             }else{
                 Toast.makeText(application,"Connection Error, try again!",Toast.LENGTH_SHORT).show()
-                finish()
+                
             }
 
 
