@@ -9,10 +9,13 @@ class MyItem(
     lng: Double,
     title: String,
     snippet: String,
+    scooter: Scooter
 ) : ClusterItem {
     private val position: LatLng
     private val title: String
     private val snippet: String
+    private val scooter: Scooter
+
 
 
 
@@ -29,10 +32,21 @@ class MyItem(
     }
 
 
+    fun getScooter(): Scooter? {
+        return scooter
+    }
+
+
+
+
+
     init {
         position = LatLng(lat, lng)
         this.title = title
         this.snippet = snippet
+        this.scooter = scooter
+
+
 
 
     }

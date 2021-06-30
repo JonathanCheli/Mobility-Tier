@@ -7,9 +7,7 @@ import android.graphics.Canvas
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 
@@ -46,5 +44,14 @@ class MarkerClusterRenderer(
         vectorDrawable.draw(canvas)
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
+
+    /*
+    override fun onClusterItemRendered(clusterItem: MyItem, marker: Marker) {
+        super.onClusterItemRendered(clusterItem, marker)
+        getMarker(clusterItem).showInfoWindow()
+    }
+
+     */
+
 
 }

@@ -35,11 +35,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterManager
 import java.util.*
-
-
-
-
-
+import android.widget.Toast
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderListener , ClusterManager.OnClusterItemInfoWindowClickListener<MyItem> {
 
@@ -53,12 +49,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     private var nearestLocationBattery : Int?= null
     private var fleetbirdId : Int? = null
     var clusterManager : ClusterManager<MyItem>? =null
-    var items : MutableList<MyItem>? = null
     private var clickedClusterItem :MyItem? = null
-
-    private var scooterData : Scooter? = null
-
-
 
     private fun bitmapDescriptorFromVector(
         context: Context,
@@ -85,10 +76,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     private var destinationMarker: MutableList<Marker>? = ArrayList()
     private var polyLinePaths: MutableList<Polyline>? = ArrayList()
     private var progressDialog: ProgressDialog? = null
-    private var progressDialog2: ProgressDialog? = null
-    private var markerPosition : LatLng? =null
 
-
+    private var zoneId :String? =null
+    private var resolution :  String? = null
+    private var battery: Int? =null
+    private var state: String? = null
+    private var model : String? =null
+    private var fleetbirdId_ : Int?= null
+    private var newlocationName_ : String? =null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,11 +96,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-
-
         fusedLocation = LocationServices.getFusedLocationProviderClient(this)
-
-        progressDialog2 = ProgressDialog.show(this, "Please wait", "Loading map", true)
 
 
     }
@@ -114,20 +105,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-
-
-
         clusterManager = ClusterManager<MyItem>(this, mMap)
         clusterManager!!.renderer = MarkerClusterRenderer(this, mMap, clusterManager!!)
         mMap!!.setOnCameraIdleListener(clusterManager)
         mMap !!. setOnMarkerClickListener(clusterManager)
         mMap !!. setOnInfoWindowClickListener (clusterManager)
-
         mMap!!.setInfoWindowAdapter(clusterManager!!.markerManager)
-        progressDialog2!!.dismiss()
         clusterManager!!.setOnClusterItemInfoWindowClickListener(this)
-
-
 
 
         if (ActivityCompat.checkSelfPermission(
@@ -148,7 +132,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         mMap!!.uiSettings.isZoomControlsEnabled = true
         mMap!!.uiSettings.isCompassEnabled = true
         mMap!!.isMyLocationEnabled = true
+
+
         fusedLocation.lastLocation.addOnSuccessListener { location ->
+
+            if (location != null) {
+                currentLocation = LatLng(location.latitude, location.longitude)
+                mMap!!.moveCamera(CameraUpdateFactory.newLatLng(currentLocation!!))
+                mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation!!, 18f))
+
+            }else{
+                Toast.makeText(application,"Connection Error, try again!",Toast.LENGTH_SHORT).show()
+                finish()
+            }
 
 
             dataViewModel = ViewModelProvider(this).get(DataViewModel::class.java)
@@ -159,45 +155,36 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                 latLng = LatLng(latLonModel.latitude.toDouble(), latLonModel.longitude.toDouble())
 
 
-                scooterData = latLonModel
-
-                clusterManager!!.setOnClusterItemClickListener(object :
-                    ClusterManager.OnClusterItemClickListener<MyItem?> {
+                clusterManager!!.setOnClusterItemClickListener(object : ClusterManager.OnClusterItemClickListener<MyItem?> {
                     override fun onClusterItemClick(item: MyItem?): Boolean {
                         clickedClusterItem = item!!
 
-                        markerPosition = item.position
+                        clusterManager!!.addItem(item)
 
-
+                        zoneId= item.getScooter()!!.zoneId
+                        resolution= item.getScooter()!!.resolution
+                        battery= item.getScooter()!!.battery
+                        state= item.getScooter()!!.state
+                        model= item.getScooter()!!.model
+                        fleetbirdId_ = item.getScooter()!!.fleetbirdId
+                        val lat = item.getScooter()!!.latitude
+                        val lng = item.getScooter()!!.longitude
+                        newlocationName_ = obtainAddress(LatLng(lat.toDouble(),lng.toDouble()))
 
                         return false
-
-
                     }
-
-
                 })
 
 
-
-
-
                 addPersonItems(latLonModel)
-
                 clusterManager!!.markerCollection.setInfoWindowAdapter(MyCustomAdapterForItems(this))
-
-
-
                 clusterManager!!.cluster()
-
-
-
-                items = mutableListOf()
 
 
                 var distance = 0.0
                 var nearestLocationIndex = 0
                 for (i in it.indices) {
+
 
                     val currentDistance = getDistanceInMeter(
                         LatLng(it.get(i).latitude.toDouble(), it.get(i).longitude.toDouble()),
@@ -235,24 +222,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
         })
 
-
-
-            // i will add a Marker with this currentLocation in onDirectionFinderSuccess Method//
-            if (location != null) {
-                currentLocation = LatLng(location.latitude, location.longitude)
-                mMap!!.moveCamera(CameraUpdateFactory.newLatLng(currentLocation!!))
-                mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation!!, 18f))
-
-
-            }
-
-
-
         }
-        
-
-
-
 
         binding.closestLocationButton.setOnClickListener{
             sendRequest()
@@ -260,17 +230,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
             binding.batteryId.text = nearestLocationBattery.toString() + " %"
             binding.batteryId.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_battery_blue, 0, 0, 0)
             binding.idTierMobility.text = getString(R.string.tier_number) + fleetbirdId.toString()
+
         }
 
     }
 
+
     private fun addPersonItems(latLonModel: Scooter) {
         val newlocationName = obtainAddress(latLng!!)
-        clusterManager!!.addItem(MyItem(latLonModel.latitude.toDouble(), latLonModel.longitude.toDouble(), newlocationName,snippet = ""))
+        clusterManager!!.addItem(MyItem(
+            latLonModel.latitude.toDouble(),
+            latLonModel.longitude.toDouble(),
+            newlocationName,
+            snippet = ""
+        ,latLonModel))
 
 
     }
-
 
     private fun cameraConfigurations(latLng: LatLng) {
         mMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latLng.latitude,latLng.longitude),18f))
@@ -282,6 +258,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
                 e.printStackTrace()
             }
     }
+
 
     private fun getDistanceInMeter(start: LatLng, end: LatLng): Double {
         val startPoint = Location("locationA")
@@ -336,6 +313,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
         // we return the text of the address//
         return textAddress
     }
+
+
 
 
     fun onDirectionFinderStart(route: List<Route?>?) {
@@ -442,13 +421,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,  DirectionFinderLi
 
         val intent = Intent(this, OtherActivity::class.java)
 
-
+        intent.putExtra("zoneId",zoneId)
+        intent.putExtra("resolution",resolution)
+        intent.putExtra("battery",battery)
+        intent.putExtra("state",state)
+        intent.putExtra("model",model)
+        intent.putExtra("fleetbirdId_",fleetbirdId_)
+        intent.putExtra("newlocationName_",newlocationName_)
         startActivity(intent)
 
-        //You may want to do different things for each InfoWindow:
 
         //You may want to do different things for each InfoWindow:
-        if (item!!.getTitle().equals("some title")) {
+
+        if(item!!.position == nearestLocation){
+
 
             //do something specific to this InfoWindow....
         }

@@ -1,30 +1,24 @@
-package com.example.tier_challeng_jonathancheli.OA_Adapter
+package com.example.tier_challeng_jonathancheli.N_Adapter
 
 import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
-
 import android.view.View
-
 import android.view.ViewGroup
-
 import android.widget.ImageView
-
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tier_challeng_jonathancheli.N_Model.NewsItem
 
-import com.example.tier_challeng_jonathancheli.OA_Model.ImageItem
 import com.example.tier_challeng_jonathancheli.R
-import com.example.tier_challeng_jonathancheli.SingleImage
 
 
-class ImageAdapter     // Constructor for adapter class
+class NewsAdapter     // Constructor for adapter class
 // which takes a list of Images type
     (  // List with ImageItem type
-    private val list: MutableList<ImageItem> = ArrayList(),
+    private val list: MutableList<NewsItem> = ArrayList(),
 
-val context : Context
+    val context : Context
 ) :
-    RecyclerView.Adapter<ImageAdapter.MyView>() {
+    RecyclerView.Adapter<NewsAdapter.MyView>() {
     // View Holder class which
     // extends RecyclerView.ViewHolder
     inner class MyView(view: View) : RecyclerView.ViewHolder(view) {
@@ -37,7 +31,7 @@ val context : Context
 
             // initialise ImageView with id
             imageView = view
-                .findViewById<View>(R.id.id_image_recycler) as ImageView
+                .findViewById<View>(R.id.id_news_recycler_image) as ImageView
         }
     }
 
@@ -53,7 +47,7 @@ val context : Context
         val itemView: View = LayoutInflater
             .from(parent.context)
             .inflate(
-                R.layout.recycler_item,
+                R.layout.news_recycler_item,
                 parent,
                 false
             )
@@ -75,6 +69,7 @@ val context : Context
         holder.imageView.setImageResource(imageP.image)
 
 
+        /*
         holder.imageView.setOnClickListener{
             val intent = Intent(context, SingleImage::class.java)
             intent.putExtra("image", imageP.image)
@@ -82,6 +77,8 @@ val context : Context
 
 
         }
+
+         */
 
 
 
